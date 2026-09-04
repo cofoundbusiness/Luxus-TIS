@@ -4,14 +4,14 @@ import { InventorySummary } from '../../components/trucks/inventory-summary';
 import { InventoryFilters } from '../../components/trucks/inventory-filters';
 import type { FilterState } from '../../components/trucks/inventory-filters';
 import { InventoryTable } from '../../components/trucks/inventory-table';
-import { getInventorySummary, searchTrucks } from '../../services/inventory-service';
-import { trucks as mockTrucks } from '../../data/mock';
+import { getInventorySummary, searchTrucks, getAllTrucks, addTruck } from '../../services/inventory-service';
 import { Plus } from 'lucide-react';
 import { TruckFormModal } from '../../components/trucks/truck-form-modal';
 import type { Truck } from '../../types';
 
+
 export default function InventoryPage() {
-  const [trucks, setTrucks] = useState<Truck[]>(mockTrucks);
+  const [trucks, setTrucks] = useState<Truck[]>(getAllTrucks());
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,15 +26,10 @@ export default function InventoryPage() {
   const filteredTrucks = useMemo(() => searchTrucks(trucks, searchQuery, filters), [trucks, searchQuery, filters]);
 
   const handleAddTruck = (newTruckData: Partial<Truck>) => {
-    const newTruck: Truck = {
-      ...newTruckData,
-      id: `TRK-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    } as Truck;
-    
-    setTrucks([newTruck, ...trucks]);
+    addTruck(newTruckData);
+    setTrucks(getAllTrucks());
     setIsAddModalOpen(false);
+    // Optionally alert('Truck added successfully'); but it's okay without it too.
   };
 
   return (

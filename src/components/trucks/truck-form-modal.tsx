@@ -49,11 +49,17 @@ export function TruckFormModal({ isOpen, onClose, onSubmit, initialData }: Truck
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let parsedDate = formData.purchaseDate as string;
+      if (parsedDate && !parsedDate.includes('T')) {
+        parsedDate = new Date(parsedDate).toISOString();
+      }
+
       const payload = {
         ...formData,
         fuelType: formData.fuelType || 'DIESEL',
         transmission: formData.transmission || 'MANUAL',
-        expectedProfit: (formData.sellingPrice || 0) - (formData.purchasePrice || 0)
+        expectedProfit: (formData.sellingPrice || 0) - (formData.purchasePrice || 0),
+        purchaseDate: parsedDate
       };
 
       truckSchema.parse(payload);

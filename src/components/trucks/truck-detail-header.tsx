@@ -1,4 +1,4 @@
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Truck } from '../../types';
 import { TruckStatusBadge } from './truck-status-badge';
@@ -6,9 +6,10 @@ import { TruckStatusBadge } from './truck-status-badge';
 interface TruckDetailHeaderProps {
   truck: Truck;
   onEdit: () => void;
+  onDelete?: () => void;
 }
 
-export function TruckDetailHeader({ truck, onEdit }: TruckDetailHeaderProps) {
+export function TruckDetailHeader({ truck, onEdit, onDelete }: TruckDetailHeaderProps) {
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-6 mb-6">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -30,7 +31,14 @@ export function TruckDetailHeader({ truck, onEdit }: TruckDetailHeaderProps) {
           >
             <Edit className="w-4 h-4" /> Edit
           </button>
-          {/* Note: Change status could be an action here, for now edit handles it */}
+          {onDelete && (
+            <button 
+              onClick={onDelete}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-red-200 text-red-600 rounded-md hover:bg-red-50 text-sm font-medium transition-colors"
+            >
+              <Trash2 className="w-4 h-4" /> Delete
+            </button>
+          )}
         </div>
       </div>
     </div>

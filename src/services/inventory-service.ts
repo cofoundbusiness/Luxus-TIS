@@ -1,7 +1,66 @@
-import { trucks, expenses, leads, deals, activities, documents, MOCK_REFERENCE_DATE, customers, brokers } from '../data/mock';
+import { trucks, expenses, leads, deals, activities, documents, MOCK_REFERENCE_DATE, customers, brokers, loans, commissions } from '../data/mock';
 import type { Truck } from '../types';
 import { calculateTruckProfit } from '../calculations/truck-profit';
 import { getDaysDifference } from '../utils/format';
+
+export const getAllTrucks = () => [...trucks];
+
+export const addTruck = (truckData: Partial<Truck>) => {
+  const newTruck = {
+    ...truckData,
+    id: `TRK-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: truckData.status || 'AVAILABLE'
+  } as Truck;
+  
+  trucks.unshift(newTruck);
+  
+  activities.unshift({
+    id: `ACT-${Date.now()}`,
+    action: 'CREATED',
+    description: `Added ${newTruck.manufacturer} ${newTruck.model} to inventory`,
+    entityType: 'TRUCK',
+    entityId: newTruck.id,
+    performedBy: 'SYSTEM',
+    timestamp: newTruck.createdAt
+  });
+
+  return newTruck;
+};
+
+export const updateTruck = (truckId: string, truckData: Partial<Truck>) => {
+  const index = trucks.findIndex(t => t.id === truckId);
+  if (index !== -1) {
+    trucks[index] = { ...trucks[index], ...truckData, updatedAt: new Date().toISOString() };
+    return trucks[index];
+  }
+  return null;
+};
+
+export const canDeleteTruck = (truckId: string) => {
+  const hasDeals = deals.some(d => d.truckId === truckId);
+  const hasLoans = loans.some(l => l.truckId === truckId);
+  const hasCommissions = commissions.some(c => deals.some(d => d.id === c.dealId && d.truckId === truckId));
+  const hasExpenses = expenses.some(e => e.truckId === truckId);
+  const hasDocuments = documents.some(d => d.entityType === 'TRUCK' && d.entityId === truckId);
+  const hasLeads = leads.some(l => l.truckId === truckId);
+
+  if (hasDeals || hasLoans || hasCommissions || hasExpenses || hasDocuments || hasLeads) {
+    return false;
+  }
+  return true;
+};
+
+export const deleteTruck = (truckId: string) => {
+  if (!canDeleteTruck(truckId)) {
+    throw new Error("This truck cannot be deleted because it is linked to existing business records. Its history must be preserved.");
+  }
+  const index = trucks.findIndex(t => t.id === truckId);
+  if (index !== -1) {
+    trucks.splice(index, 1);
+  }
+};
 
 export const getInventorySummary = (currentTrucks: Truck[]) => {
   const available = currentTrucks.filter(t => t.status === 'AVAILABLE').length;

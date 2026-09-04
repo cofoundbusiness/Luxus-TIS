@@ -17,8 +17,22 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { useAuth } from '../../auth/auth-context';
+import type { Permission } from '../../auth/permissions';
 
-const navigation = [
+type NavItem = {
+  name: string;
+  to: string;
+  icon: any;
+  permission?: Permission;
+};
+
+type NavGroup = {
+  section: string;
+  items: NavItem[];
+};
+
+const navigation: NavGroup[] = [
   {
     section: 'WORKSPACE',
     items: [
@@ -28,45 +42,52 @@ const navigation = [
   {
     section: 'OPERATIONS',
     items: [
-      { name: 'Inventory', to: '/inventory', icon: Truck },
-      { name: 'Documents', to: '/documents', icon: FileText },
-      { name: 'Expenses', to: '/expenses', icon: Receipt },
+      { name: 'Inventory', to: '/inventory', icon: Truck, permission: 'inventory.view' },
+      { name: 'Documents', to: '/documents', icon: FileText, permission: 'documents.view' },
+      { name: 'Expenses', to: '/expenses', icon: Receipt, permission: 'expenses.view' },
     ]
   },
   {
     section: 'COMMERCIAL',
     items: [
-      { name: 'Leads', to: '/leads', icon: Contact },
-      { name: 'Customers', to: '/customers', icon: Users },
-      { name: 'Brokers', to: '/brokers', icon: Briefcase },
-      { name: 'Deals', to: '/deals', icon: Handshake },
+      { name: 'Leads', to: '/leads', icon: Contact, permission: 'leads.view' },
+      { name: 'Customers', to: '/customers', icon: Users, permission: 'customers.view' },
+      { name: 'Brokers', to: '/brokers', icon: Briefcase, permission: 'brokers.view' },
+      { name: 'Deals', to: '/deals', icon: Handshake, permission: 'deals.view' },
     ]
   },
   {
     section: 'FINANCE',
     items: [
-      { name: 'Loans', to: '/loans', icon: Landmark },
-      { name: 'Commissions', to: '/commissions', icon: Percent },
-      { name: 'Partners', to: '/finance-partners', icon: Building2 },
+      { name: 'Loans', to: '/loans', icon: Landmark, permission: 'loans.view' },
+      { name: 'Commissions', to: '/commissions', icon: Percent, permission: 'commissions.view' },
+      { name: 'Partners', to: '/finance-partners', icon: Building2, permission: 'finance_partners.view' },
     ]
   },
   {
     section: 'ANALYTICS',
     items: [
-      { name: 'Reports', to: '/reports', icon: BarChart3 },
-      { name: 'Insights', to: '/insights', icon: Lightbulb },
+      { name: 'Reports', to: '/reports', icon: BarChart3, permission: 'reports.view' },
+      { name: 'Insights', to: '/insights', icon: Lightbulb, permission: 'insights.view' },
     ]
   },
   {
     section: 'ADMIN',
     items: [
-      { name: 'Users', to: '/settings/users', icon: UserCog },
-      { name: 'Settings', to: '/settings', icon: Settings },
+      { name: 'Users', to: '/settings/users', icon: UserCog, permission: 'users.view' },
+      { name: 'Settings', to: '/settings', icon: Settings, permission: 'settings.view' },
     ]
   }
 ];
 
 export function Sidebar() {
+  const { can } = useAuth();
+
+  const filteredNavigation = navigation.map(group => ({
+    ...group,
+    items: group.items.filter(item => !item.permission || can(item.permission))
+  })).filter(group => group.items.length > 0);
+
   return (
     <aside className="hidden md:flex flex-col w-64 bg-navy-900 border-r border-slate-800 text-slate-300 h-screen sticky top-0 flex-shrink-0">
       <div className="h-16 flex items-center px-6 border-b border-slate-700/50">
@@ -89,7 +110,7 @@ export function Sidebar() {
       </div>
       
       <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8 no-scrollbar">
-        {navigation.map((group) => (
+        {filteredNavigation.map((group) => (
           <div key={group.section}>
             <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
               {group.section}

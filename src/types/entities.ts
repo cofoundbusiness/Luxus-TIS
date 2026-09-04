@@ -10,7 +10,9 @@ import type {
   CommissionStatus,
   ExpenseCategory,
   DocumentStatus,
-  EntityType
+  EntityType,
+  UserRole,
+  UserStatus
 } from './enums';
 
 export interface TruckPhoto {
@@ -173,4 +175,16 @@ export interface Activity {
   description: string;
   performedBy: ID;
   timestamp: ISODateString;
+}
+
+export interface User {
+  id: ID;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  avatar?: string;
+  lastLogin?: ISODateString;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
 }

@@ -89,3 +89,22 @@ export const EntityType = {
   EXPENSE: 'EXPENSE'
 } as const;
 export type EntityType = typeof EntityType[keyof typeof EntityType];
+
+export const UserRole = {
+  ADMINISTRATOR: 'ADMINISTRATOR',
+  MANAGER: 'MANAGER',
+  SALES: 'SALES',
+  OPERATIONS: 'OPERATIONS',
+  FINANCE: 'FINANCE',
+  VIEWER: 'VIEWER'
+} as const;
+export type UserRole = typeof UserRole[keyof typeof UserRole];
+
+export const UserStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const;
+export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
+
+
+

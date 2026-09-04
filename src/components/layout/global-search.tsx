@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo, type KeyboardEvent } from 'react';
+import { useState, useEffect, useRef, useMemo, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Truck, Users, Contact, Briefcase, Handshake, Landmark, X, FileText, Receipt, Banknote, Building } from 'lucide-react';
+import { Search, Truck, Users, Contact, Briefcase, Handshake, Landmark, X, FileText, Receipt, Banknote, Building, type LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 import { trucks, customers, brokers, leads, deals, loans, financePartners, commissions, expenses, documents } from '../../data/mock';
@@ -12,7 +12,7 @@ interface SearchResult {
   type: EntityType;
   title: string;
   subtitle: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   url: string;
   isViewAll?: boolean;
 }

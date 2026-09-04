@@ -1,13 +1,15 @@
-import { Bell, HelpCircle, User, LogOut, Settings as SettingsIcon } from 'lucide-react';
+import { Bell, HelpCircle, User, LogOut, Settings as SettingsIcon, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useState } from 'react';
 import { GlobalSearch } from './global-search';
 import { useAuth } from '../../auth/auth-context';
 import { useNavigate } from 'react-router-dom';
+import { useSidebar } from './sidebar-context';
 
 export function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { currentUser, logout, can } = useAuth();
   const navigate = useNavigate();
+  const { isSidebarCollapsed, toggleSidebar } = useSidebar();
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,10 +26,24 @@ export function Header() {
   const roleDisplay = userRole.charAt(0) + userRole.slice(1).toLowerCase();
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-10 flex-shrink-0">
+    <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-10 flex-shrink-0 transition-all duration-200">
       
-      {/* Global Search */}
-      <GlobalSearch />
+      <div className="flex items-center flex-1 gap-2">
+        <button
+          onClick={toggleSidebar}
+          aria-label={isSidebarCollapsed ? "Open sidebar" : "Close sidebar"}
+          title={isSidebarCollapsed ? "Open sidebar" : "Close sidebar"}
+          className="hidden md:flex p-2 text-slate-400 hover:text-navy-900 hover:bg-slate-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-navy-900 focus:border-transparent mr-1"
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeftOpen className="h-[18px] w-[18px]" />
+          ) : (
+            <PanelLeftClose className="h-[18px] w-[18px]" />
+          )}
+        </button>
+        {/* Global Search */}
+        <GlobalSearch />
+      </div>
 
       {/* Right side actions */}
       <div className="flex items-center gap-2 sm:gap-3 ml-4">

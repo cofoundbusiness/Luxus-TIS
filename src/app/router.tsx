@@ -145,11 +145,15 @@ export const router = createBrowserRouter([
           { path: '/settings/users', element: <ProtectedRoute requiredPermission="users.view" />, children: [{ index: true, element: <UsersPage /> }] },
           { path: '/settings/business', element: <ProtectedRoute requiredPermission="settings.edit" />, children: [{ index: true, element: <BusinessSettingsPage /> }] },
 
-          // 404 Pages
+          // 404 inside layout
           { path: '/404notfound', element: <NotFoundPage /> },
           { path: '*', element: <NotFoundPage /> },
         ]
       }
     ],
   },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  }
 ]);

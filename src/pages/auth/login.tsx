@@ -1,18 +1,38 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/auth-context';
 import { DevAccess } from '../../components/auth/dev-access';
-import { Truck } from 'lucide-react';
+import { Truck, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isPasswordRevealed, setIsPasswordRevealed] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
+
+  // Safety: hide password on blur/visibility change
+  const hidePassword = useCallback(() => {
+    setIsPasswordRevealed(false);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('visibilitychange', hidePassword);
+    window.addEventListener('blur', hidePassword);
+    return () => {
+      document.removeEventListener('visibilitychange', hidePassword);
+      window.removeEventListener('blur', hidePassword);
+    };
+  }, [hidePassword]);
+
+  // Ensure hidden on unmount
+  useEffect(() => {
+    return () => setIsPasswordRevealed(false);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,14 +89,49 @@ export default function LoginPage() {
                   Forgot password?
                 </button>
               </div>
-              <input 
-                type="password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-900 focus:border-transparent transition-shadow text-slate-900" 
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input 
+                  type={isPasswordRevealed ? "text" : "password"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 pr-11 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-900 focus:border-transparent transition-shadow text-slate-900" 
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  title="Hold to reveal password"
+                  aria-label={isPasswordRevealed ? "Password revealed, release to hide" : "Hold to reveal password"}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-900 focus-visible:rounded transition-colors"
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    setIsPasswordRevealed(true);
+                  }}
+                  onPointerUp={hidePassword}
+                  onPointerLeave={hidePassword}
+                  onPointerCancel={hidePassword}
+                  onKeyDown={(e) => {
+                    if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
+                      e.preventDefault();
+                      setIsPasswordRevealed(true);
+                    }
+                  }}
+                  onKeyUp={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      hidePassword();
+                    }
+                  }}
+                  onBlur={hidePassword}
+                  tabIndex={0}
+                >
+                  {isPasswordRevealed ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center">

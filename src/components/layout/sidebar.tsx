@@ -69,10 +69,22 @@ const navigation = [
 export function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-navy-900 border-r border-slate-800 text-slate-300 h-screen sticky top-0 flex-shrink-0">
-      <div className="h-16 flex items-center px-6 border-b border-slate-800">
-        <div className="flex flex-col">
-          <span className="text-lg font-bold text-white tracking-tight">LUXUS TiS</span>
-          <span className="text-[10px] uppercase tracking-wider text-slate-400">Truck Inventory System</span>
+      <div className="h-16 flex items-center px-6 border-b border-slate-700/50">
+        <div className="flex items-center gap-3">
+          {/* Geometric mark */}
+          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-sm shadow-amber-500/20">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 12L8 4L14 12H2Z" fill="#1e293b" stroke="#1e293b" strokeWidth="1.5" strokeLinejoin="round" />
+              <path d="M5 12L8 7L11 12" fill="#f59e0b" stroke="#1e293b" strokeWidth="1" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-baseline gap-0.5">
+              <span className="text-base font-bold text-white tracking-wide" style={{ fontVariant: 'small-caps', letterSpacing: '0.08em' }}>LUXUS</span>
+              <span className="text-base font-light text-amber-400 tracking-wide"> TiS</span>
+            </div>
+            <span className="text-[9px] uppercase tracking-[0.2em] text-slate-500 font-medium">Truck Inventory System</span>
+          </div>
         </div>
       </div>
       

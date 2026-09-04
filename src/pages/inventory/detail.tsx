@@ -7,6 +7,7 @@ import { TruckDocuments } from '../../components/trucks/truck-documents';
 import { TruckExpenses } from '../../components/trucks/truck-expenses';
 import { TruckCommercialContext } from '../../components/trucks/truck-commercial-context';
 import { TruckFormModal } from '../../components/trucks/truck-form-modal';
+import { TruckPhotos } from '../../components/trucks/truck-photos';
 import { 
   getTruckDetails, 
   getTruckExpenses, 
@@ -80,6 +81,7 @@ export default function TruckDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <TruckOverview truck={truck} />
+          <TruckPhotos truck={truck} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TruckDocuments documents={documents} />
             <TruckExpenses expenses={expenses} />

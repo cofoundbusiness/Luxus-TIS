@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { truckSchema } from '../../validations/truck';
-import { X } from 'lucide-react';
+import { X, ImagePlus, Star, Trash2 } from 'lucide-react';
 import type { Truck } from '../../types';
 import { z } from 'zod';
 
 interface TruckFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: Partial<Truck>) => void;
+  onSubmit: (data: Partial<Truck>, photos?: File[]) => void;
   initialData?: Truck;
 }
 
@@ -28,6 +28,20 @@ export function TruckFormModal({ isOpen, onClose, onSubmit, initialData }: Truck
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Create object URLs for previews
+    const urls = selectedFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+    
+    // Cleanup URLs
+    return () => {
+      urls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [selectedFiles]);
 
   if (!isOpen) return null;
 
@@ -40,10 +54,23 @@ export function TruckFormModal({ isOpen, onClose, onSubmit, initialData }: Truck
     }
 
     setFormData(prev => ({ ...prev, [name]: parsedValue }));
-    // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setSelectedFiles(prev => [...prev, ...filesArray]);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setSelectedFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,7 +90,7 @@ export function TruckFormModal({ isOpen, onClose, onSubmit, initialData }: Truck
       };
 
       truckSchema.parse(payload);
-      onSubmit(payload as Truck);
+      onSubmit(payload as Truck, selectedFiles);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -182,8 +209,73 @@ export function TruckFormModal({ isOpen, onClose, onSubmit, initialData }: Truck
                 </select>
                 {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status}</p>}
               </div>
-
             </div>
+
+            {/* Optional Photos Section */}
+            {!initialData && (
+              <div className="pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-700">Photos</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Optional. Add one or more truck photos. The first photo will be used as the primary image.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-navy-900 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100 transition-colors"
+                  >
+                    <ImagePlus className="w-3.5 h-3.5" />
+                    Add Photos
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </div>
+
+                {previewUrls.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {previewUrls.map((url, idx) => (
+                      <div key={url} className="relative group w-20 h-20 rounded-md border border-slate-200 overflow-hidden bg-slate-50">
+                        <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                        
+                        {/* Remove Action */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => removeFile(idx)}
+                            className="p-1.5 bg-white text-red-500 rounded hover:bg-red-50 transition-colors"
+                            title="Remove photo"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Primary Badge */}
+                        {idx === 0 && (
+                          <div className="absolute top-1 left-1">
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400 drop-shadow-sm" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-20 h-20 rounded-md border-2 border-dashed border-slate-200 flex flex-col items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors text-slate-400"
+                    >
+                      <ImagePlus className="w-5 h-5 mb-1" />
+                      <span className="text-[10px]">Add</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            
           </form>
         </div>
 

@@ -13,6 +13,14 @@ import type {
   EntityType
 } from './enums';
 
+export interface TruckPhoto {
+  id: string;
+  url: string;
+  isPrimary: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
 export interface Truck {
   id: ID;
   registrationNumber: string;
@@ -33,6 +41,7 @@ export interface Truck {
   purchaseDate: ISODateString;
   createdAt: ISODateString;
   updatedAt: ISODateString;
+  photos?: TruckPhoto[];
 }
 
 export interface Customer {
